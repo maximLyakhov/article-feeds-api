@@ -1,0 +1,122 @@
+useDotenv: false
+
+service:
+  name: ${env:PREFIX}-${env:ENVIRONMENT}-external-api-articles-feed
+
+provider:
+  name: aws
+  stackName: ${env:PREFIX}-${env:ENVIRONMENT}-external-api-articles-feed
+  apiName: ${env:PREFIX}-${env:ENVIRONMENT}-external-api-articles-feed
+  role: arn:aws:iam::${env:ACCOUNT_ID}:role/${env:PREFIX}-general-lambda
+  cfnRole: arn:aws:iam::${env:ACCOUNT_ID}:role/${env:PREFIX}-general-cloudformation
+  runtime: nodejs12.x
+  stage: ${env:ENVIRONMENT}
+  region: ${env:REGION}
+  logRetentionInDays: 14
+  environment:
+    SERVICE_NAME: ${env:PREFIX}-${env:ENVIRONMENT}-external-api-articles-feed
+    NODE_ENV: ${env:ENVIRONMENT}
+    CONFIG_REGISTRY_CODE: ${env:CODE}
+    CONFIG_REGISTRY: ${env:CONFIG_REGISTRY}
+    ES_API: ${env:ES_API}
+  deploymentBucket:
+    name: ${env:ARTIFACTS_BUCKET}
+  tags:
+    Tribe: OP
+    Usage: External Services
+    Environment: ${env:ENVIRONMENT}
+  logs:
+    restApi:
+      accessLogging: false
+      executionLogging: false
+functions:
+  articleFeedsAPI:
+    name: ${env:PREFIX}-${env:ENVIRONMENT}-external-api-articles-feed
+    description: Service for navigation Article Feeds API
+    handler: dist/main.handler
+    timeout: 30
+    memorySize: 512
+    events:
+      - http:
+          method: get
+          cors: true
+          path: /{any+}
+
+resources:
+  Resources:
+    CloudFront:
+      Type: AWS::CloudFront::Distribution
+      Properties:
+        DistributionConfig:
+          Comment: External api article feed
+          Origins:
+            - Id: external-feeds-api
+              DomainName: !Join ["", [!Ref ApiGatewayRestApi, '.execute-api.${env:REGION}.amazonaws.com']]
+              OriginPath: '/${env:ENVIRONMENT}'
+              CustomOriginConfig:
+                HTTPPort: 80
+                HTTPSPort: 443
+                OriginProtocolPolicy: https-only
+                OriginReadTimeout: 30
+                OriginKeepaliveTimeout: 5
+                OriginSSLProtocols:
+                  - TLSv1
+                  - TLSv1.1
+                  - TLSv1.2
+          DefaultCacheBehavior:
+            TargetOriginId: external-feeds-api
+            ViewerProtocolPolicy: redirect-to-https
+            AllowedMethods: [GET, HEAD, OPTIONS]
+            CachedMethods: [GET, HEAD, OPTIONS]
+            ForwardedValues:
+              QueryString: true
+            MaxTTL: 3600
+            MinTTL: 3600
+            DefaultTTL: 3600
+            SmoothStreaming: false
+            Compress: true
+          Enabled: true
+          IPV6Enabled: true
+          HttpVersion: http2
+          ViewerCertificate:
+            SslSupportMethod: sni-only
+            AcmCertificateArn: ${env:CERTIFICATE}
+            MinimumProtocolVersion: TLSv1.2_2018
+          Aliases:
+            - ${env:DOMAIN}
+          Restrictions:
+            GeoRestriction:
+              RestrictionType: none
+          CustomErrorResponses:
+            - ErrorCode: 400
+              ErrorCachingMinTTL: 0
+            - ErrorCode: 403
+              ErrorCachingMinTTL: 0
+            - ErrorCode: 404
+              ErrorCachingMinTTL: 0
+            - ErrorCode: 405
+              ErrorCachingMinTTL: 0
+            - ErrorCode: 414
+              ErrorCachingMinTTL: 0
+            - ErrorCode: 416
+              ErrorCachingMinTTL: 0
+            - ErrorCode: 500
+              ErrorCachingMinTTL: 0
+            - ErrorCode: 501
+              ErrorCachingMinTTL: 0
+            - ErrorCode: 502
+              ErrorCachingMinTTL: 0
+            - ErrorCode: 503
+              ErrorCachingMinTTL: 0
+            - ErrorCode: 504
+              ErrorCachingMinTTL: 0
+
+    Record:
+      Type: AWS::Route53::RecordSet
+      Properties:
+        HostedZoneName: ${env:HOSTED_ZONE}
+        Name: ${env:DOMAIN}.
+        Type: A
+        AliasTarget:
+          HostedZoneId: Z2FDTNDATAQYW2
+          DNSName: !GetAtt CloudFront.DomainName

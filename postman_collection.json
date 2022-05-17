@@ -1,0 +1,144 @@
+{
+	"info": {
+		"_postman_id": "8d8793e3-dfc5-4a13-8908-e1c204c601dd",
+		"name": "Article Feed API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "getConfiguration",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://{{env}}.gateway.jakop.cloud/configregistry-{{env}}/config/264c0f34a1ded9baa28d8a68e7fcfc93_clientConfiguration/?code=99015a4a-443f-43ec-8015-49298e70928f-1488882426123",
+					"protocol": "https",
+					"host": [
+						"{{env}}",
+						"gateway",
+						"jakop",
+						"cloud"
+					],
+					"path": [
+						"configregistry-{{env}}",
+						"config",
+						"264c0f34a1ded9baa28d8a68e7fcfc93_clientConfiguration",
+						""
+					],
+					"query": [
+						{
+							"key": "code",
+							"value": "99015a4a-443f-43ec-8015-49298e70928f-1488882426123"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getPages",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/article-feeds?destinationEntity=mailonline&pageTrail=root%2Ctravel%2Cescape",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"article-feeds"
+					],
+					"query": [
+						{
+							"key": "destinationEntity",
+							"value": "mailonline"
+						},
+						{
+							"key": "pageTrail",
+							"value": "root%2Ctravel%2Cescape"
+						},
+						{
+							"key": "pageTrail",
+							"value": "root%2Ctravel",
+							"disabled": true
+						},
+						{
+							"key": "pageTrail",
+							"value": "root%2Cescape",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getPages Dev",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/dev/article-feeds?destinationEntity=mailonline&pageTrail=root%2Ctravel%2Cescape",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"dev",
+						"article-feeds"
+					],
+					"query": [
+						{
+							"key": "destinationEntity",
+							"value": "mailonline"
+						},
+						{
+							"key": "pageTrail",
+							"value": "root%2Ctravel%2Cescape"
+						},
+						{
+							"key": "pageTrail",
+							"value": "root%2Ctravel",
+							"disabled": true
+						},
+						{
+							"key": "pageTrail",
+							"value": "root%2Cescape",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "env",
+			"value": "acceptance"
+		}
+	]
+}

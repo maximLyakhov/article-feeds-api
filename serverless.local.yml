@@ -1,0 +1,28 @@
+useDotenv: true
+
+service:
+  name: ${env:SERVICE_NAME}
+
+plugins:
+  - serverless-offline
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: eu-west-1
+  stage: dev
+  stackName: ${env:SERVICE_NAME}-serverless
+  environment:
+    SERVICE_NAME: ${env:SERVICE_NAME}
+    NODE_ENV: ${env:NODE_ENV}
+    CONFIG_REGISTRY_CODE: ${env:CONFIG_REGISTRY_CODE}
+
+functions:
+  getPages:
+    name: ${self:service.name}
+    description: Service for article feeds api
+    handler: dist/main.handler
+    events:
+      - http:
+          method: GET
+          path: /article-feeds
